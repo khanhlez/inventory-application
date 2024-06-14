@@ -1,0 +1,92 @@
+<div class="d-flex align-items-center justify-content-between py-4">
+  <h3>Category Management</h3>
+  <a class="btn btn-primary mb-4 text-right" href="/category/new"
+    ><b>+</b> Create new category</a
+  >
+</div>
+
+<table
+  class="table table-responsive table-bordered grocery-crud-table table-hover"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Creation Date</th>
+      <th>Updated Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(var i = 0; i < categories.length; i++) { %>
+    <tr class="align-middle">
+      <td><%= categories[i]._id %></td>
+      <td><%= categories[i].name %></td>
+      <td><%= categories[i].description %></td>
+      <td><%= categories[i].creation_date_formatted %></td>
+      <td><%= categories[i].updated_date_formatted %></td>
+      <td class="d-flex align-items-center gap-2">
+        <a
+          class="d-block btn btn-outline-primary"
+          href="/category/<%= categories[i]._id %>"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+        <a
+          class="btn btn-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteModal-<%= categories[i]._id %>"
+          ><i class="bi bi-trash-fill"></i
+        ></a>
+      </td>
+    </tr>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="deleteModal-<%= categories[i]._id %>"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel-<%= categories[i]._id %>"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              class="modal-title"
+              id="deleteModalLabel-<%= categories[i]._id %>"
+            >
+              Confirm Delete
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete the category "<%= categories[i].name
+            %>"?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <form
+              action="/category/<%= categories[i]._id %>/delete"
+              method="POST"
+            >
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </tbody>
+</table>

@@ -1,0 +1,87 @@
+<div class="d-flex align-items-center justify-content-between py-4">
+  <h3>Item Management</h3>
+  <a class="btn btn-primary mb-4 text-right" href="item/new"
+    ><b>+</b> Create new Item</a
+  >
+</div>
+
+<table
+  class="table table-responsive table-bordered grocery-crud-table table-hover"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for(var i = 0; i < items.length; i++) { %>
+    <tr class="align-middle">
+      <td><%= items[i]._id %></td>
+      <td><%= items[i].name %></td>
+      <td><%= items[i].category %></td>
+      <td><%= items[i].price %></td>
+      <td><%= items[i].number_in_stock %></td>
+      <td><%= items[i].description %></td>
+      <td class="d-flex align-items-center gap-2">
+        <a
+          class="d-block btn btn-outline-primary"
+          href="/item/<%= items[i]._id%>"
+          ><i class="bi bi-pencil-square"></i
+        ></a>
+        <a
+          class="btn btn-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteModal-<%= items[i]._id %>"
+          ><i class="bi bi-trash-fill"></i
+        ></a>
+      </td>
+    </tr>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      class="modal fade"
+      id="deleteModal-<%= items[i]._id %>"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel-<%= items[i]._id %>"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel-<%= items[i]._id %>">
+              Confirm Delete
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete the item "<%= items[i].name %>"?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <form action="/item/<%= items[i]._id %>/delete" method="POST">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </tbody>
+</table>

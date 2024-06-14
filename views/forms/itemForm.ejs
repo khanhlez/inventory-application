@@ -1,0 +1,120 @@
+<row>
+  <% if (errors && errors.length) { %>
+  <div class="alert alert-danger mt-4" role="alert">
+    Please follow the below rules:
+    <ul>
+      <% errors.forEach(function(error) { %>
+      <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  </div>
+  <% } %>
+  <form method="POST" class="col-md-6 mx-auto py-4 item-form">
+    <div class="mb-3">
+      <label for="inputitemName" class="form-label">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="item_name"
+        name="item_name"
+        value="<%= item.name ? item.name : null %>"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="inputitemDescription" class="form-label">Description </label>
+      <textarea
+        required
+        class="form-control"
+        id="item_description"
+        name="item_description"
+        rows="3"
+      >
+<%= item.description ? item.description.trim() : null %></textarea
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="inputCategoryName" class="form-label">Category Name</label>
+      <select
+        id="item_category"
+        class="form-select form-select-sm"
+        name="item_category"
+        required
+      >
+        <% categories.forEach(function(category) { %>
+        <option value="<%= category.id %>" <% if (category.id === item.category) { %>selected<% } %>>
+          <%= category.name %>
+        </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="inputPrice" class="form-label">Price</label>
+      <input
+        type="number"
+        class="form-control"
+        id="item_price"
+        name="item_price"
+        value="<%= item.price ? item.price : null %>"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="inpuNumberOfStock" class="form-label">Number in stock</label>
+      <input
+        type="number"
+        class="form-control"
+        id="item_number_in_stock"
+        name="item_number_in_stock"
+        value="<%= item.number_in_stock ? item.number_in_stock : null %>"
+        required
+      />
+    </div>
+
+    <% if (item.creation_date_formatted && item.updated_date_formatted) { %>
+    <div class="mb-3">
+      <label for="inputitemImage" class="form-label">item Creation Date </label>
+      <input
+        type="text"
+        class="form-control"
+        id="item_creation_date"
+        name="item_creation_date"
+        value="<%= item.creation_date_formatted ? item.creation_date_formatted : null %>"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="inputitemImage" class="form-label">item Updated Date </label>
+      <input
+        type="text"
+        class="form-control"
+        id="item_updated_date"
+        name="item_updated_date"
+        value="<%= item.updated_date_formatted ? item.updated_date_formatted : null %>"
+      />
+    </div>
+    <% } %>
+
+    <div class="mb-3">
+      <label for="inputitemImage" class="form-label">item Image</label>
+      <input
+        type="file"
+        class="form-control-file"
+        id="item_image"
+        name="item_image"
+        value="<%= item.image ? item.image : null %>"
+      />
+    </div>
+
+    <hr />
+
+    <div class="text-end">
+      <a href="/item" class="btn btn-default">Back to Categories</a>
+      <button type="submit" class="btn btn-primary">
+        <%= item.id ? "Update" : "Create" %>
+      </button>
+    </div>
+  </form>
+</row>
