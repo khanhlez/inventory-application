@@ -9,7 +9,7 @@
     </ul>
   </div>
   <% } %>
-  <form method="POST" class="col-md-6 mx-auto py-4 item-form">
+  <form method="POST" enctype="multipart/form-data" class="col-md-6 mx-auto py-4 item-form">
     <div class="mb-3">
       <label for="inputitemName" class="form-label">Name</label>
       <input
@@ -74,9 +74,9 @@
       />
     </div>
 
-    <% if (item.creation_date_formatted && item.updated_date_formatted) { %>
+    <% if (item._id) { %>
     <div class="mb-3">
-      <label for="inputitemImage" class="form-label">item Creation Date </label>
+      <label for="inputitemImage" class="form-label">Creation Date </label>
       <input
         type="text"
         class="form-control"
@@ -86,7 +86,7 @@
       />
     </div>
     <div class="mb-3">
-      <label for="inputitemImage" class="form-label">item Updated Date </label>
+      <label for="inputitemImage" class="form-label">Updated Date </label>
       <input
         type="text"
         class="form-control"
@@ -97,21 +97,25 @@
     </div>
     <% } %>
 
+    <% if (item.image) { %>
+      <div class="mb-3">
+        <img src="<%= item.image %>" class="img-thumbnail" alt="<%= item.name %>">
+      </div>
+    <%  } %>
     <div class="mb-3">
-      <label for="inputitemImage" class="form-label">item Image</label>
+      <label for="inputitemImage" class="form-label"><%= item.image ? 'Change Image' : 'Image' %></label>
       <input
         type="file"
-        class="form-control-file"
+        class="form-control"
         id="item_image"
         name="item_image"
-        value="<%= item.image ? item.image : null %>"
       />
     </div>
 
     <hr />
 
     <div class="text-end">
-      <a href="/item" class="btn btn-default">Back to Categories</a>
+      <a href="/item" class="btn btn-default">Back to Items</a>
       <button type="submit" class="btn btn-primary">
         <%= item.id ? "Update" : "Create" %>
       </button>

@@ -9,9 +9,13 @@
     </ul>
   </div>
   <% } %>
-  <form method="POST" class="col-md-6 mx-auto py-4 catefory-form">
+  <form
+    method="POST"
+    enctype="multipart/form-data"
+    class="col-md-6 mx-auto py-4 catefory-form"
+  >
     <div class="mb-3">
-      <label for="inputCategoryName" class="form-label">Category Name</label>
+      <label for="inputCategoryName" class="form-label">Name</label>
       <input
         type="text"
         class="form-control"
@@ -23,7 +27,7 @@
     </div>
     <div class="mb-3">
       <label for="inputCategoryDescription" class="form-label">
-        Category Description
+        Description
       </label>
       <textarea
         required
@@ -32,12 +36,12 @@
         name="category_description"
         rows="3"
       >
-<%= category.description ? category.description.trim() : null %></textarea
+<%= category.description ? category.description.trim() : null %>
+</textarea
       >
     </div>
 
-    <% if (category.creation_date_formatted && category.updated_date_formatted)
-    { %>
+    <% if (category._id) { %>
     <div class="mb-3">
       <label for="inputCategoryImage" class="form-label"
         >Category Creation Date
@@ -62,16 +66,24 @@
         value="<%= category.updated_date_formatted ? category.updated_date_formatted : null %>"
       />
     </div>
-    <% } %>
-
+    <% } %> <% if (category.image) { %>
     <div class="mb-3">
-      <label for="inputCategoryImage" class="form-label">Category Image</label>
+      <img
+        src="<%= category.image %>"
+        class="img-thumbnail"
+        alt="<%= category.name %>"
+      />
+    </div>
+    <% } %>
+    <div class="mb-3">
+      <label for="inputCategoryImage" class="form-label">
+        <%= category.image ? 'Change Image' : 'Image' %>
+      </label>
       <input
         type="file"
-        class="form-control-file"
+        class="form-control"
         id="category_image"
         name="category_image"
-        value="<%= category.image ? category.image : null %>"
       />
     </div>
 

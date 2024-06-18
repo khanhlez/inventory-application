@@ -3,6 +3,8 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+require("dotenv").config(); // Load environment variables from .env file
+const cloudinary = require("cloudinary").v2;
 
 const indexRouter = require("./routes/index");
 const categoryRouter = require("./routes/category");
@@ -33,6 +35,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+cloudinary.config({
+  cloud_name: "dmqnipwig",
+  api_key: process.env.COULDINARY_API_KEY,
+  api_secret: process.env.COULDINARY_API_SECRET,
+});
 
 app.use("/", indexRouter);
 app.use("/category", categoryRouter);

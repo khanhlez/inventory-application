@@ -2,9 +2,15 @@ const Category = require("../models/category");
 const Item = require("../models/item");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 exports.category_list = asyncHandler(async (req, res, next) => {
-  const allCategories = await Category.find({}).sort({ name: 1 }).exec();
+  const allCategories = await Category.find({})
+    .sort({ updated_date: -1 })
+    .exec();
 
   res.render("layout", {
     body: "pages/category",
@@ -20,20 +26,44 @@ exports.category_create_get = (req, res, next) => {
 };
 
 exports.category_create_post = [
-  body("category_name", "Category name is required")
+  upload.single("category_image"),
+  body("category_name")
     .trim()
-    .isLength({ min: 1, max: 20 })
+    .notEmpty()
+    .withMessage("Category name is required")
+    .isLength({ min: 1 })
+    .withMessage("Category name must be at least 1 character long")
     .escape(),
-  body("category_description", "Category description is required")
+  body("category_description")
     .trim()
-    .isLength({ min: 1, max: 100 })
+    .notEmpty()
+    .withMessage("Category description is required")
+    .isLength({ min: 10 })
+    .withMessage("Category description must be at least 10 character long")
     .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
+    let uploadedImageUrl;
+
+    if (req.file) {
+      try {
+        const uploadedImage = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream((error, result) =>
+            error ? reject(error) : resolve(result)
+          );
+          stream.end(req.file.buffer);
+        });
+        uploadedImageUrl = uploadedImage.secure_url;
+      } catch (err) {
+        console.log(err);
+        res.status(500).send("Error uploading image to cloudinary");
+      }
+    }
+
     const category = new Category({
       name: req.body.category_name,
       description: req.body.category_description,
-      image: req.file ? req.file.path : null,
+      image: uploadedImageUrl ? uploadedImageUrl : null,
       creation_date: new Date(),
       updated_date: new Date(),
     });
@@ -41,7 +71,7 @@ exports.category_create_post = [
     if (!errors.isEmpty()) {
       res.render("layout", {
         body: "forms/categoryForm",
-        data: { errors: errors.array() },
+        data: { category: {}, errors: errors.array() },
       });
       return;
     }
@@ -61,6 +91,7 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
 
 exports.category_update_post = [
   // Validate and sanitize the request body
+  upload.single("category_image"),
   body("category_name")
     .trim()
     .notEmpty()
@@ -82,28 +113,50 @@ exports.category_update_post = [
     .escape(),
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
-    const category = new Category({
-      name: req.body.category_name,
-      description: req.body.category_description,
-      image: req.file ? req.file.path : null,
-      creation_date: req.body.category_creation_date || "",
-      updated_date: new Date(),
-      _id: req.params.id,
-    });
+    const category = Category.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).send("Category not found");
+    }
 
     if (!errors.isEmpty()) {
       res.render("layout", {
         body: "forms/categoryForm",
         data: { category, errors: errors.array() },
       });
-    } else {
-      const updatedCategory = await Category.findByIdAndUpdate(
-        req.params.id,
-        category,
-        {}
-      );
-      res.redirect(updatedCategory.url);
+      return;
     }
+
+    let uploadedImageUrl;
+    if (req.file) {
+      try {
+        const uploadedImage = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream((error, result) =>
+            error ? reject(error) : resolve(result)
+          );
+          stream.end(req.file.buffer);
+        });
+        uploadedImageUrl = uploadedImage.url;
+      } catch (err) {
+        console.error(err);
+        res.status(500).send("Error uploading image to cloudinary");
+      }
+    }
+
+    category.name = req.body.category_name;
+    category.description = req.body.category_description;
+    if (uploadedImageUrl) {
+      category.image = uploadedImageUrl;
+    }
+
+    category.updated_date = new Date();
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      req.params.id,
+      category,
+      {}
+    );
+    res.redirect(updatedCategory.url);
   }),
 ];
 
