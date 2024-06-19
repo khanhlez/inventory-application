@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 require("dotenv").config(); // Load environment variables from .env file
 const cloudinary = require("cloudinary").v2;
+const compression = require("compression");
+const helmet = require("helmet");
 
 const indexRouter = require("./routes/index");
 const categoryRouter = require("./routes/category");
@@ -12,15 +14,23 @@ const itemRouter = require("./routes/item");
 
 const app = express();
 
+// Set up rate limiter: maximum of twenty requests per minute
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+
 // Set up mongoose connection
 const mongoose = require("mongoose");
-const { item_list } = require("./controllers/itemController");
 mongoose.set("strictQuery", false);
-const dev_db_url =
-  "mongodb+srv://khanhle:VEgvv0PRGjsdww80@cluster0.qer225u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const dev_db_url = process.env.MONGODB_URI;
 const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 main().catch((err) => console.log(err));
+compression;
 
 async function main() {
   await mongoose.connect(mongoDB);
@@ -33,7 +43,16 @@ app.set("views", path.join(__dirname, "views"));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(compression()); // Compress all routes
 app.use(cookieParser());
+// Set CSP headers to allow our Bootstrap to be served
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "cdn.jsdelivr.net"],
+    },
+  })
+);
 app.use(express.static(path.join(__dirname, "public")));
 
 cloudinary.config({
